@@ -3,6 +3,7 @@ package ezechukwu.service;
 import ezechukwu.model.Customer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomerService {
     private final Set<Customer> customers = new HashSet<>();
@@ -16,12 +17,12 @@ public class CustomerService {
         }
         return INSTANCE;
     }
-    public void addCustomers(String email, String firstName, String lastName){
+    public void addCustomer(String email, String firstName, String lastName){
         customers.add(new Customer(firstName,lastName, email));
     }
     public Optional<Customer> getCustomer(String email){
         for(Customer customer : customers){
-            if(customer.getEmail() == email){
+            if(customer.getEmail().equals(email)){
                 return Optional.of(customer);
             }
         }

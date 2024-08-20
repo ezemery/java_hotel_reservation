@@ -6,6 +6,7 @@ import ezechukwu.model.Reservation;
 import ezechukwu.model.Room;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReservationService {
     private final Set<IRoom> rooms = new HashSet<>();
@@ -31,7 +32,7 @@ public class ReservationService {
     }
     public Optional<IRoom> getARoom(String roomId){
         for(IRoom room : rooms){
-            if(room.getRoomNumber() == roomId){
+            if(room.getRoomNumber().equals(roomId)){
                 return Optional.of(room);
             }
         }
@@ -43,14 +44,33 @@ public class ReservationService {
         reservations.add(reservation);
         return reservation;
     }
+    public Collection<IRoom> getAllRooms(){
+        return rooms.stream().toList();
+    }
+    public Collection<IRoom> findFreeRooms(Date checkInDate, Date checkOutDate){
+        List<IRoom> availableRooms = new ArrayList<>();
+        Set<IRoom> reservedRooms = reservations.stream().map(reservation -> reservation.getRoom()).collect(Collectors.toSet());
+        for(IRoom room : rooms){
+            if(!reservedRooms.contains(room)){
+                availableRooms.add(room);
+            }else{
+                // check if the reserved room has the same checkin and checkout date
+                for(Reservation reservation: reservations){
+                    if(reservation.getRoom().equals(room)){
+                        if(reservation.getCheckInDate().before(checkInDate) && reservation.getCheckOutDate().before(checkOutDate)){
+                            availableRooms.add(room);
+                        }
+                    }
+                }
 
-//    public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate){
-//
-//    }
+            }
+        }
+        return availableRooms;
+    }
     public Collection<Reservation> getCustomerReservation(Customer customer){
         return reservations.stream().filter(reservation -> reservation.getCustomer() == customer).toList();
     }
-    public void printAllReservations(){
-        System.out.println(reservations.stream().toList());
+    public Collection<Reservation> printAllReservations(){
+        return reservations.stream().toList();
     }
 }

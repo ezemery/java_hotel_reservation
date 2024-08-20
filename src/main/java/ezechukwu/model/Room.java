@@ -3,9 +3,9 @@ package ezechukwu.model;
 import java.util.Objects;
 
 public class Room implements IRoom{
-    protected String roomNumber;
-    protected Double price;
-    protected RoomType enumeration;
+    private final String roomNumber;
+    private final Double price;
+    private final RoomType enumeration;
 
     public Room(String roomNumber, Double price, RoomType enumeration) {
         this.roomNumber = roomNumber;
@@ -47,11 +47,11 @@ public class Room implements IRoom{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Room room = (Room) o;
-        return Objects.equals(roomNumber, room.roomNumber);
+        return Objects.equals(roomNumber, room.roomNumber) && Objects.equals(price, room.price) && enumeration == room.enumeration;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roomNumber);
+        return Objects.hash(roomNumber, price, enumeration);
     }
 }

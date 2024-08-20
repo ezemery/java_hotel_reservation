@@ -1,6 +1,7 @@
 package ezechukwu.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 public final class Reservation {
     private Customer customer;
@@ -27,7 +28,7 @@ public final class Reservation {
         return room;
     }
 
-    public void setRoom(IRoom room) {
+    public void setRoom(Room room) {
         this.room = room;
     }
 
@@ -55,5 +56,18 @@ public final class Reservation {
                 ", checkInDate=" + this.checkInDate +
                 ", checkOutDate=" + this.checkOutDate +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return Objects.equals(customer, that.customer) && Objects.equals(room, that.room) && Objects.equals(checkInDate, that.checkInDate) && Objects.equals(checkOutDate, that.checkOutDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(customer, room, checkInDate, checkOutDate);
     }
 }

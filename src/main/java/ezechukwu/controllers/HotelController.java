@@ -3,6 +3,7 @@ package ezechukwu.controllers;
 import ezechukwu.model.Customer;
 import ezechukwu.model.IRoom;
 import ezechukwu.model.Reservation;
+import ezechukwu.model.Room;
 import ezechukwu.service.CustomerService;
 import ezechukwu.service.ReservationService;
 
@@ -31,24 +32,25 @@ public class HotelController {
     }
 
     public void createACustomer(String email, String firstname, String lastName){
-        CustomerService.getInstance().addCustomers(email, firstname,lastName);
+        CustomerService.getInstance().addCustomer(email, firstname,lastName);
     }
 
     public IRoom getRoom(String roomNumber){
         Optional<IRoom> room =  ReservationService.getInstance().getARoom(roomNumber);
         if(!room.isEmpty()){
-            room.get();
+            return room.get();
         }
         return null;
     }
-    public Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate){
-        return ReservationService.getInstance().reserveARoom(getCustomer(customerEmail), room, checkInDate, checkOutDate);
+    public Reservation bookARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate){
+        return ReservationService.getInstance().reserveARoom(customer, room, checkInDate, checkOutDate);
     }
 
     public Collection<Reservation> getCustomersReservations(String customerEmail){
-        return ReservationService.getInstance().getCustomerReservation(getCustomer(customerEmail));
+        Customer customer = this.getCustomer(customerEmail);
+        return ReservationService.getInstance().getCustomerReservation(customer);
     }
-//    public Collection<IRoom> findARoom(Date checkIn, Date checkOut){
-//        return  ReservationService.getInstance().findRooms(checkIn, checkOut);
-//    }
+    public Collection<IRoom> findARoom(Date checkIn, Date checkOut){
+        return ReservationService.getInstance().findFreeRooms(checkIn, checkOut);
+    }
 }
