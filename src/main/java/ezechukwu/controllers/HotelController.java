@@ -42,7 +42,7 @@ public class HotelController {
         }
         return null;
     }
-    public Reservation bookARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate){
+    public Reservation bookARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) throws Exception {
         return ReservationService.getInstance().reserveARoom(customer, room, checkInDate, checkOutDate);
     }
 
@@ -52,5 +52,9 @@ public class HotelController {
     }
     public Collection<IRoom> findARoom(Date checkIn, Date checkOut){
         return ReservationService.getInstance().findFreeRooms(checkIn, checkOut);
+    }
+
+    public Collection<IRoom> findRecommendedRoom(Date checkIn, Date checkOut){
+        return ReservationService.getInstance().findRecommendedRooms(checkIn, checkOut);
     }
 }

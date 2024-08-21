@@ -7,6 +7,7 @@ A Java-based hotel reservation system that allows users to search for available 
 - **User Registration**: Users can create an account.
 - **Room Search**: Search for available rooms based on date.
 - **Reservation Management**: Users can book rooms, view reservations.
+- **Recommended Room**: Suggest recommended rooms when fully booked.
 - **Admin Panel**: Admin users can add rooms, add customers and view all reservations.
 
 

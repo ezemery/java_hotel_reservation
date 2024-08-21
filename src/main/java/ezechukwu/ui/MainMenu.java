@@ -3,6 +3,7 @@ package ezechukwu.ui;
 import ezechukwu.controllers.HotelController;
 import ezechukwu.model.Customer;
 import ezechukwu.model.IRoom;
+import ezechukwu.service.ReservationService;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -15,6 +16,63 @@ import java.util.Scanner;
 
 public class MainMenu {
     private MainMenu(){}
+
+    private static void bookRoom(Scanner scanner, Collection<IRoom> rooms, Date checkin, Date checkout){
+        boolean bookRoomKeepRunning = true;
+        while(bookRoomKeepRunning){
+            for(IRoom room : rooms){
+                System.out.println("Room Number:"+ room.getRoomNumber()+" Room Price "+ room.getRoomPrice()+" Room Type:"+ room.getRoomType()
+                );
+            }
+
+            System.out.println("Would you like to book a room? y/n");
+            String yesNo = scanner.nextLine();
+            switch (yesNo){
+                case "y":
+                    System.out.println("Select room number");
+                    String roomNumber = scanner.nextLine();
+                    IRoom registeredRoom = HotelController.getInstance().getRoom(roomNumber);
+                    System.out.println(registeredRoom + " "+ roomNumber);
+                    System.out.println("Do you have an account? y/n");
+                    String accountYesNo = scanner.nextLine();
+                    switch (accountYesNo){
+                        case "y":
+                            System.out.println("Enter your email");
+                            String accountEmail = scanner.nextLine();
+                            Customer registeredCustomer = HotelController.getInstance().getCustomer(accountEmail);
+                            try{
+                                System.out.println(HotelController.getInstance().bookARoom(registeredCustomer,registeredRoom,checkin, checkout));
+                            }catch(Exception e){
+                                System.out.println(e.getLocalizedMessage());
+                            }
+                            break;
+                        case "n":
+                            Customer newCustomer = MainMenu.createCustomer(scanner);
+                            try{
+                                System.out.println(HotelController.getInstance().bookARoom(newCustomer,registeredRoom,checkin, checkout));
+                            }catch (Exception e){
+                                System.out.println(e.getLocalizedMessage());
+                            }
+
+                            break;
+                        default:
+                            System.out.println("Invalid input. \n Enter y or n");
+                            break;
+                    }
+                    bookRoomKeepRunning = false;
+                    break;
+                case "n":
+                    bookRoomKeepRunning = false;
+                    break;
+                default:
+                    System.out.println("Invalid input. \n Enter y or n");
+                    break;
+
+            }
+
+        }
+
+    }
 
     private static void createReservation(Scanner scanner, DateFormat dateFormat){
         System.out.println("Enter your Checkin Date (dd/mm/yyyy):");
@@ -32,50 +90,17 @@ public class MainMenu {
             throw new RuntimeException(e);
         }
         Collection<IRoom> rooms = HotelController.getInstance().findARoom(checkin,checkout);
-        System.out.println("There are "+rooms.size()+" available rooms");
         if(rooms.size() > 0){
-            boolean bookRoomKeepRunning = true;
-            while(bookRoomKeepRunning){
-                for(IRoom room : rooms){
-                    System.out.println("Room Number:"+ room.getRoomNumber()+" Room Price "+ room.getRoomPrice()+" Room Type:"+ room.getRoomType()
-                    );
-                }
-
-                System.out.println("Would you like to book a room? y/n");
-                String yesNo = scanner.nextLine();
-                switch (yesNo){
-                    case "y":
-                        System.out.println("Select room number");
-                        String roomNumber = scanner.nextLine();
-                        IRoom registeredRoom = HotelController.getInstance().getRoom(roomNumber);
-                        System.out.println(registeredRoom + " "+ roomNumber);
-                        System.out.println("Do you have an account? y/n");
-                        String accountYesNo = scanner.nextLine();
-                        switch (accountYesNo){
-                            case "y":
-                                System.out.println("Enter your email");
-                                String accountEmail = scanner.nextLine();
-                                Customer registeredCustomer = HotelController.getInstance().getCustomer(accountEmail);
-                                System.out.println(HotelController.getInstance().bookARoom(registeredCustomer,registeredRoom,checkin, checkout));
-                                break;
-                                case "n":
-                                Customer newCustomer = MainMenu.createCustomer(scanner);
-                                System.out.println(HotelController.getInstance().bookARoom(newCustomer,registeredRoom,checkin, checkout));
-                                break;
-                            default:
-                                System.out.println("Invalid input. \n Enter y or n");
-                                break;
-                        }
-                        bookRoomKeepRunning = false;
-                        break;
-                    case "n":
-                        bookRoomKeepRunning = false;
-                        break;
-                    default:
-                        System.out.println("Invalid input. \n Enter y or n");
-                        break;
-
-                }
+            System.out.println(rooms.size()+" available room(s)");
+            bookRoom(scanner, rooms, checkin, checkout);
+        }else{
+            System.out.println("There are no available rooms for the dates provided, checking for recommended rooms");
+            Collection<IRoom> recommendedRooms = HotelController.getInstance().findRecommendedRoom(checkin,checkout);
+            if(recommendedRooms.size() > 0){
+                System.out.println(recommendedRooms.size()+" recommended available room(s) for checkin / checkout: "+ ReservationService.addSevenDays(checkin)+" / " + ReservationService.addSevenDays(checkout));
+                bookRoom(scanner, recommendedRooms, ReservationService.addSevenDays(checkin), ReservationService.addSevenDays(checkout));
+            }else{
+                System.out.println("Unfortunately we could not find a room");
             }
         }
     }
